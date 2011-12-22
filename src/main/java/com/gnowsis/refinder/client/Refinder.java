@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -88,6 +89,9 @@ public class Refinder
 	private OAuthConsumer	consumer;
 	private OAuthProvider	provider;
 
+	// HTTP
+	private HttpClient httpClient;
+	
 	/**
 	 * Instantiates a Refinder client.
 	 * 
@@ -101,8 +105,15 @@ public class Refinder
 	 * @param consumerSecret
 	 *           The OAuth consumer secret of your application, provided by
 	 *           Gnowsis.
+	 * @param httpClient an alternative HTTP client to be used for connections.
 	 */
 	public Refinder(String serviceUrl, String consumerKey, String consumerSecret)
+	{
+		this(serviceUrl, consumerKey, consumerSecret, new DefaultHttpClient());
+	}
+
+	
+	public Refinder(String serviceUrl, String consumerKey, String consumerSecret, HttpClient httpClient)
 	{
 		this.serviceUrl = serviceUrl;
 		this.consumerKey = consumerKey;
@@ -115,6 +126,8 @@ public class Refinder
 
 		this.consumer = new CommonsHttpOAuthConsumer(this.consumerKey, this.consumerSecret);
 		this.provider = new CommonsHttpOAuthProvider(this.requestUrl, this.accessUrl, this.authorizeUrl);
+		
+		this.httpClient = httpClient;
 //		{
 //			@Override
 //			protected HttpRequest createRequest(String endpointUrl) 
@@ -830,7 +843,8 @@ public class Refinder
 
 			this.consumer.sign(httpPost);
 
-			HttpResponse response = new DefaultHttpClient().execute(httpPost);
+			HttpResponse response = this.httpClient.execute(httpPost);
+			Util.consume(response.getEntity());
 		}
 		catch (Exception e)
 		{
@@ -862,7 +876,7 @@ public class Refinder
 			this.consumer.sign(httpGet);
 			this.log.debug("Signature: " + httpGet.getFirstHeader("Authorization").getValue());
 			
-			HttpResponse response = new DefaultHttpClient().execute(httpGet);
+			HttpResponse response = this.httpClient.execute(httpGet);
 			if(response.getStatusLine().getStatusCode() == 200)
 			{
 				Model g = ModelFactory.createDefaultModel();
@@ -875,14 +889,18 @@ public class Refinder
 	
 				return g;
 			}
-			else if(response.getStatusLine().getStatusCode() == 201)
-				throw new RefinderException(RefinderException.Status.NotFound);
-			else if(response.getStatusLine().getStatusCode() == 401)
-				throw new RefinderException(RefinderException.Status.NotAuthenticated);
-			else if(response.getStatusLine().getStatusCode() == 404)
-				throw new RefinderException(RefinderException.Status.NotFound);
 			else
-				throw new RefinderException(RefinderException.Status.Unknown);
+			{
+				Util.consume(response.getEntity());
+				if(response.getStatusLine().getStatusCode() == 201)
+					throw new RefinderException(RefinderException.Status.NotFound);
+				else if(response.getStatusLine().getStatusCode() == 401)
+					throw new RefinderException(RefinderException.Status.NotAuthenticated);
+				else if(response.getStatusLine().getStatusCode() == 404)
+					throw new RefinderException(RefinderException.Status.NotFound);
+				else
+					throw new RefinderException(RefinderException.Status.Unknown);
+			}
 		}
 		catch (Exception e)
 		{
@@ -914,10 +932,13 @@ public class Refinder
 
 			this.consumer.sign(httpPost);
 
-			HttpResponse response = new DefaultHttpClient().execute(httpPost);
+			HttpResponse response = this.httpClient.execute(httpPost);
 			if(this.cookie==null && response.getHeaders("Set-Cookie").length>0){
 				this.cookie=  response.getHeaders("Set-Cookie")[0].getValue();
 			}
+			
+			Util.consume(response.getEntity());
+			
 			return response;
 		}
 		catch (Exception e)
@@ -943,8 +964,9 @@ public class Refinder
 
 			this.consumer.sign(httpPut);
 
-			HttpResponse response = new DefaultHttpClient().execute(httpPut);
-
+			HttpResponse response = this.httpClient.execute(httpPut);
+			Util.consume(response.getEntity());
+			
 			return response;
 		}
 		catch (Exception e)
@@ -969,7 +991,8 @@ public class Refinder
 			this.consumer.sign(httpDelete);
 			this.log.debug("Signature: " + httpDelete.getFirstHeader("Authorization").getValue());
 
-			HttpResponse response = new DefaultHttpClient().execute(httpDelete);
+			HttpResponse response = this.httpClient.execute(httpDelete);
+			Util.consume(response.getEntity());
 
 			return response;
    	}

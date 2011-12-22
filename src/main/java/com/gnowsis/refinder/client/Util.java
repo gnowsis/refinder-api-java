@@ -8,6 +8,8 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.http.HttpEntity;
+
 public class Util
 {
 	 public static String makeDataObjectUrl(String dataSourceId, String localId)
@@ -87,5 +89,18 @@ public class Util
  	    outputStream.close();
  	 
  	    return byteData;
+ 	}
+ 	
+ 	public static void consume(HttpEntity entity)
+ 	{
+ 		try
+ 		{
+ 			InputStream is = entity.getContent();
+ 			is.close();
+ 		}
+ 		catch (IOException e)
+ 		{
+ 			// ignore
+ 		}
  	}
 }
