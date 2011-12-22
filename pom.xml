@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.gnowsis</groupId>
+	<artifactId>refinder-client</artifactId>
+	<packaging>jar</packaging>
+	<version>0.1.2561</version>
+	<name>refinder-client</name>
+	<url>http://www.gnowsis.com</url>
+	<!-- -->
+	<!-- -->
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<inherited>true</inherited>
+					<configuration>
+						<source>1.5</source>
+						<target>1.5</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<descriptorRefs>
+							<descriptorRef>
+								jar-with-dependencies
+							</descriptorRef>
+						</descriptorRefs>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<!-- -->
+	<!-- -->
+	<repositories>
+		<!-- -->
+		<!-- maven -->
+		<repository>
+			<id>maven-repo1</id>
+			<url>http://repo1.maven.org/maven2/</url>
+			<name>Maven repo1</name>
+		</repository>
+		<!-- -->
+		<!-- aperture -->
+		<repository>
+			<id>aperture-repo</id>
+			<url>http://aperture.sourceforge.net/maven/</url>
+			<name>Aperture Maven Repository</name>
+		</repository>
+		<!--  -->
+		<!-- rdf2go -->
+		<repository>
+			<id>semweb4j-repo</id>
+			<name>Semweb4j.org maven repo</name>
+			<url>http://semweb4j.org/repo/</url>
+		</repository>
+		<!--  -->
+		<!-- for opennlp -->
+		<repository>
+			<id>mvnsearch</id>
+			<name>mvnsearch</name>
+			<url>http://www.mvnsearch.org/maven2/</url>
+		</repository>
+		<!--  -->
+	</repositories>
+	<!-- -->
+	<!-- -->
+	<dependencies>
+		<!-- -->
+		<!-- common dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.12</version>
+		</dependency>
+		<!-- -->
+		<!-- HTTP client -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+		<!-- -->
+		<!-- jena -->
+		<dependency>
+			<groupId>com.hp.hpl.jena</groupId>
+			<artifactId>jena</artifactId>
+			<version>2.5.6</version>
+		</dependency>
+		<!-- -->
+		<!-- SignPost (Oauth Library) -->
+		<dependency>
+			<groupId>oauth.signpost</groupId>
+			<artifactId>signpost-commonshttp4</artifactId>
+			<version>1.2.1.1</version>
+		</dependency>
+	</dependencies>
+</project>
