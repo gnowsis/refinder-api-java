@@ -22,6 +22,7 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -1078,11 +1079,13 @@ public class Refinder
 	
 	private RefinderException handleException(Exception e)
 	{
-		// TODO implement
-
 		e.printStackTrace();
 		this.log.error("Error: " + e.getMessage());
-		return new RefinderException(RefinderException.Status.Unknown, e);
+		
+		if(e instanceof RefinderException)
+			return (RefinderException) e;
+		else
+			return new RefinderException(RefinderException.Status.Unknown, e);
 	}
 
 	private String serializeGraph(Model graph)
