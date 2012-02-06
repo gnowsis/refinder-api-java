@@ -37,10 +37,7 @@ class ThingDeserializer
 
 			// generic thing URIs always use http://
 			if(thingUri.startsWith("https://"))
-			{
-				thingUri = "http://" + thingUri.substring("https://".length());
-				n = ResourceFactory.createResource(thingUri);
-			}
+				n = ResourceFactory.createResource("http://" + thingUri.substring("https://".length()));
 			
 			log.debug("Thing URI: <" + thingUri + ">");
 			
