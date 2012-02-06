@@ -93,6 +93,9 @@ public class Util
  	
  	public static void consume(HttpEntity entity)
  	{
+ 		if(entity == null)
+ 			return;
+ 		
  		try
  		{
  			InputStream is = entity.getContent();
