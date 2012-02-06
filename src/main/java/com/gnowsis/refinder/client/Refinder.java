@@ -489,6 +489,79 @@ public class Refinder
 		return response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT;
 	} 
    
+   /**
+    * upload contents of inputStream as file that is attached to the given thing
+    * @param thing the thing for which the content should be uploaded
+    * @param byteData contents of the uploaded file
+    * @param contentType the contentType to be associated with the file 
+    */
+   public void uploadThingFile(Thing thing, byte[] byteData)
+   {
+   	String contentType = "application/octet-stream"; // FIXME content types are not yet supported
+		
+		try
+		{
+			String url = thing.getUri().toString().replace("#t", "file/");
+		
+			this.log.debug("PUT content to <" + url + "> ...");
+
+			HttpPut httpPut = new HttpPut(url);
+			httpPut.addHeader("Content-Type", contentType);
+
+			httpPut.setEntity(new ByteArrayEntity(byteData));
+
+			this.consumer.sign(httpPut);
+
+			HttpResponse response = this.httpClient.execute(httpPut);
+			Util.consume(response.getEntity());
+		}
+		catch (Exception e)
+		{
+			throw this.handleException(e);
+		}
+   }
+   
+   
+   public byte[] downloadThingFile(Thing thing)
+   {
+		try
+		{
+			String url = thing.getUri().toString().replace("#t", "file/");
+		
+			this.log.debug("GET content from <" + url + "> ...");
+
+			HttpGet httpGet = new HttpGet(url);
+			httpGet.addHeader("Accept", "*/*");
+			this.consumer.sign(httpGet);
+			HttpResponse response = this.httpClient.execute(httpGet);
+
+			if(response.getStatusLine().getStatusCode() == 200)
+			{
+				byte[] responseBody = IOUtils.toByteArray(response.getEntity().getContent());
+				return responseBody;
+			}
+			else
+			{
+				Util.consume(response.getEntity());
+				if(response.getStatusLine().getStatusCode() == 201)
+					throw new RefinderException(RefinderException.Status.NotFound);
+				else if(response.getStatusLine().getStatusCode() == 401)
+					throw new RefinderException(RefinderException.Status.NotAuthenticated);
+				else if(response.getStatusLine().getStatusCode() == 404)
+					throw new RefinderException(RefinderException.Status.NotFound);
+				else
+				{
+					this.log.error("Received status code: " + response.getStatusLine().getStatusCode());
+					throw new RefinderException(RefinderException.Status.Unknown);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw this.handleException(e);
+		}
+   }
+   
 	/**
 	 * Returns an annotation with a given UUID. Returns a <code>RefinderException</code>
 	 * if this annotation does not exist.
