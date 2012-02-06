@@ -15,6 +15,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 
 class ThingDeserializer
 {
@@ -27,12 +28,22 @@ class ThingDeserializer
 		{
 			// find out uuid
 			String thingUri = n.getURI();
+			
 			if (thingUri == null)
 			{
 				log.debug("Found no ThingURI in <" + n.getURI() + ">, returning null.");
 				return null;
 			}
 
+			// generic thing URIs always use http://
+			if(thingUri.startsWith("https://"))
+			{
+				thingUri = "http://" + thingUri.substring("https://".length());
+				n = ResourceFactory.createResource(thingUri);
+			}
+			
+			log.debug("Thing URI: <" + thingUri + ">");
+			
 			// find out type
 			String type = null;
 			Property RDF_TYPE = ResourceFactory.createProperty(RDF.type.toString());
